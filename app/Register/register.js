@@ -2,7 +2,9 @@ import React from 'react';
 
 function Register() {
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div className="d-flex justify-content-center align-items-center vh-100 bg-light"
+    style={{backgroundImage: 'url("https://i.pinimg.com/736x/ec/db/cf/ecdbcf924703da27cc68619d01d52b19.jpg")'}}
+    >
       <div className="shadow p-5 rounded-4 bg-white" style={{ width: '1200px' }}>
         <h3 className="text-center mb-4">ลงทะเบียน</h3>
 
@@ -58,9 +60,13 @@ function Register() {
           <label className="form-check-label" htmlFor="checkDefault">ยอมรับเงื่อนไข</label>
         </div>
 
-        <div className="text-center">
-          <button type="submit" className="btn btn-primary">ลงทะเบียน</button>
-        </div>
+      <center><button
+  type="submit"
+  className="btn"
+  style={{ backgroundColor: '#ff69b4', color: 'white' }} // สีชมพูพื้นหลัง + ตัวอักษรสีขาว
+>
+ลงทะเบียน
+</button></center> 
       </div>
     </div>
   );
