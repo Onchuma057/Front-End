@@ -2,7 +2,7 @@
 
 export default function Footer() {
   return (
-    <div className="container-fluid">
+    <div className="container-fluid" style={{backgroundColor: "#f8bbd0"}}> 
       <footer className="py-5">
         <div className="row">
           <div className="col-6 col-md-2 mb-3">
