@@ -1,10 +1,10 @@
 export default function Card() {
   return (
-    <div className="container-fluid">
+    <div className="container-fluid" style={{backgroundColor: "#f48fb1"}}>
       <div className="row">
         <div className="col-md-12 text-center mb-4">
             <br></br>
-          <h3>Our Project</h3>
+          <h3>Sanrio</h3>
         </div>
       </div>
 
@@ -30,14 +30,14 @@ export default function Card() {
         <div className="col-md-4 mb-4">
           <div className="card h-100">
             <img
-              src="/p2.jpg"
+              src="/p5.jpg"
               className="card-img-top w-100"
               alt="..."
               style={{ height: "250px", objectFit: "cover" }}
             />
             <div className="card-body">
               <p className="card-text">
-                คุโรมิ (ญี่ปุ่น:クロミ,อังกฤษ: Kuromi) หนึ่งในตัวละครจากการ์ตูนเรื่อง Onegai My Melody หรือในชื่อภาษาไทยว่า มายเมโลดี้ หนูน้อยแห่งป่าเมอร์รี่แลนด์ คุโรมิเกิดวันที่ 31 ตุลาคม 2005 (ตรงกับวันฮาโลวีน) เป็นกระต่ายผู้หญิงตัวสีขาวที่สวมหมวกสีดำ หูทั้งสองข้างแหลม มีหางปีศาจสีดำ และมีรูปหัวกะโหลกสีชมพูอยู่ตรงกลางของหมวกด้านหน้า
+                เฮลโลคิตตี (ญี่ปุ่น: ハローキティอังกฤษ: Hello Kitty)(ชื่อเต็ม: คิตตีไวท์  โรมาจิ: Kiti howaito; อังกฤษ: Kitty White)คือตัวละครที่สร้างโดยบริษัทซานริโอ้ ประเทศญี่ปุ่น ออกแบบครั้งแรกโดยคุณยูโกะ ชิมิซุ โดยเธอวาดออกมาเป็นภาพแมวญี่ปุ่นหางสั้น เพศเมีย สีขาว ที่ติดโบว์สีแดง
               </p>
             </div>
           </div>
