@@ -40,6 +40,7 @@ export default function Login() {
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="username" className="form-label">Username</label>
+            
             <input
               type="text"
               className="form-control"
@@ -83,8 +84,24 @@ export default function Login() {
         </form>
 
         <div className="text-center mt-3">
-          <Link href="/Register" className="text-decoration-none me-3">สมัครสมาชิก</Link>
-          <Link href="/forgot-password" className="text-decoration-none">ลืมรหัสผ่าน?</Link>
+          <Link
+  href="/Register"
+  className="text-decoration-none me-3 px-2 py-1 rounded"
+  style={{
+    backgroundColor: '#ffffff',
+    color: '#0400ffff',
+  }} > 
+  สมัครสมาชิก
+</Link>
+          <Link
+  href="/Register"
+  className="text-decoration-none me-3 px-2 py-1 rounded"
+  style={{
+    backgroundColor: '#ffffff',
+    color: '#ff0000ff',
+  }}>
+  ลืมรหัสผ่าน
+</Link>
         </div>
       </div>
     </div>
