@@ -68,7 +68,17 @@ export default function Login() {
           </div>
 
           <div className="d-grid">
-            <button type="submit" className="btn btn-primary">Login</button>
+          <div className="d-grid">
+  <button
+    type="submit"
+    className="btn"
+    style={{ backgroundColor: '#ffffffff', color: 'black' }} // เขียวสด
+  >
+    Login
+  </button>
+</div>
+
+
           </div>
         </form>
 
