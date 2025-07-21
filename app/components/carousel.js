@@ -15,10 +15,10 @@ export default function Carousel() {
       <Image src="/p1.jpg" className="d-block w-100" alt="..." width={1920} height={690} />
     </div>
     <div className="carousel-item">
-      <Image src="/p1.jpg" className="d-block w-100" alt="..." width={1920} height={690} />
+      <Image src="/p6.jpg" className="d-block w-100" alt="..." width={1920} height={690} />
     </div>
     <div className="carousel-item">
-      <Image src="/p1.jpg" className="d-block w-100" alt="..." width={1920} height={690} />
+      <Image src="/p8.jpg" className="d-block w-100" alt="..." width={1920} height={690} />
     </div>
   </div>
   <button className="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
