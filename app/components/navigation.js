@@ -123,12 +123,7 @@ export default function Navbar() {
             </li>
 
             <li className="nav-item mx-1">
-              <Link
-                className="nav-link "
-                href="/service"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
+              <Link className="nav-link" href="/service"
                 style={{
                   color: "#ad1457",
                   fontWeight: "500",
