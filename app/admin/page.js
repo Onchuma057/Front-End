@@ -29,17 +29,15 @@ export default function Page() {
 
   return (
     <>
-    <br /><br /><br /><br />
-    <div className="container">
-      <div className="card">
-  <div className="card-header">
-    Users List
-  </div>
-  <div className="card-body">
-  <div className="row">
-      <table className="table table-striped table-hover">
-        <thead>
-          <tr>
+      <div className="container mt-5">
+        <div className="card shadow">
+          <div className="card-header bg-gradient text-white" style={{ backgroundColor: '#ec407a', fontWeight: 'bold', fontSize: '1.2rem' }}>
+          </div>
+          <div className="card-body">
+            <div className="table-responsive">
+              <table className="table table-striped align-middle text-center table-bordered">
+                <thead className="table-danger">
+                  <tr>
             <th className='col-md-2 text-center'>#</th>
             <th className='col-md-4'>Firstname</th>
             <th className='col-md-4'>Fullname</th>
@@ -65,9 +63,18 @@ export default function Page() {
               <td>{item.address}</td>
               <td>{item.sex}</td>
               <td>{item.birthday}</td>
-              <td><Link href="" className="btn btn-warning">Edit</Link></td>
-              <td><button className="btn btn-pill btn-danger" type="button"><i className="fa fa-trash"></i>Del</button></td>
-            </tr>
+        <td>
+        <Link href={`/edit/${item.id}`} className="btn btn-sm btn-warning">
+    <i className="bi bi-pencil-square"></i> แก้ไข
+        </Link>
+        </td>
+    <td>
+        <button onClick={() => handleDelete(item.id)} className="btn btn-sm btn-danger">
+    <i className="bi bi-trash-fill"></i> ลบ
+        </button>
+    </td>
+    </tr>
+                    
           ))}
         </tbody>
       </table>
