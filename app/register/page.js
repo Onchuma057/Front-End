@@ -2,18 +2,19 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Swal from 'sweetalert2'; // ✅ เพิ่มการ import SweetAlert2
 
 function Register() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
-    title: '',
-    firstName: '',
-    lastName: '',
+    firstname: '',
+    fullname: '',
+    lastname: '',
     address: '',
-    gender: '',
-    birthDate: '',
+    sex: '',
+    birthday: '',
     acceptTerms: false
   });
 
@@ -60,22 +61,22 @@ function Register() {
         if (!value) error = 'กรุณากรอกรหัสผ่าน';
         else if (value.length < 6) error = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
         break;
-      case 'title':
+      case 'fullname':
         if (!value) error = 'กรุณาเลือกคำนำหน้าชื่อ';
         break;
-      case 'firstName':
+      case 'firstname':
         if (!value) error = 'กรุณากรอกชื่อ';
         break;
-      case 'lastName':
+      case 'lastname':
         if (!value) error = 'กรุณากรอกนามสกุล';
         break;
       case 'address':
         if (!value) error = 'กรุณากรอกที่อยู่';
         break;
-      case 'gender':
+      case 'sex':
         if (!value) error = 'กรุณาเลือกเพศ';
         break;
-      case 'birthDate':
+      case 'birthday':
         if (!value) error = 'กรุณาเลือกวันเกิด';
         break;
       case 'acceptTerms':
@@ -110,27 +111,73 @@ function Register() {
     return isValid;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Mark all fields as touched
-    const touchedFields = {};
-    Object.keys(formData).forEach(key => {
-      touchedFields[key] = true;
-    });
-    setTouched(touchedFields);
-    
-    if (validateForm()) {
-      setIsSubmitting(true);
-      
-      // Simulate API call
-      setTimeout(() => {
-        setIsSubmitting(false);
-        // Redirect to login page after successful registration
-        router.push('/login');
-      }, 1500);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const touchedFields = {};
+  Object.keys(formData).forEach((key) => {
+    touchedFields[key] = true;
+  });
+  setTouched(touchedFields);
+
+  if (validateForm()) {
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch('http://itdev.cmtc.ac.th:3000/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        // ✅ แสดง SweetAlert และ redirect
+        Swal.fire({
+          icon: 'success',
+          title: '<h3>บันทึกข้อมูลเรียบร้อยแล้ว</h3>',
+          showConfirmButton: false,
+          timer: 2000,
+        }).then(() => {
+          router.push('/login');
+        });
+
+        // ✅ รีเซ็ตฟอร์ม
+        setFormData({
+          username: '',
+          password: '',
+          firstName: '',
+          fullname: '',
+          lastname: '',
+          address: '',
+          sex: '',
+          birthday: '',
+          acceptTerms: false,
+        });
+
+        setErrors({});
+        setTouched({});
+      } else {
+        const data = await res.json();
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด!',
+          text: data?.message || 'ไม่สามารถบันทึกข้อมูลได้',
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาด!',
+        text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์',
+      });
     }
-  };
+
+    setIsSubmitting(false);
+  }
+};
+
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100"
@@ -211,18 +258,18 @@ function Register() {
           </div>
 
           <div className="mb-3">
-            <label htmlFor="title" className="form-label" style={{ color: '#ad1457', fontWeight: '500' }}>
+            <label htmlFor="firstname" className="form-label" style={{ color: '#ad1457', fontWeight: '500' }}>
               คำนำหน้าชื่อ <span className="text-danger">*</span>
             </label>
             <select 
-              className={`form-select ${touched.title && errors.title ? 'is-invalid' : ''}`} 
-              id="title"
-              name="title"
-              value={formData.title}
+              className={`form-select ${touched.firstname && errors.firstname ? 'is-invalid' : ''}`} 
+              id="firstname"
+              name="firstname"
+              value={formData.firstname}
               onChange={handleChange}
               onBlur={handleBlur}
               style={{
-                borderColor: touched.title && errors.title ? '#dc3545' : '#f8bbd0',
+                borderColor: touched.firstname && errors.firstname ? '#dc3545' : '#f8bbd0',
                 borderRadius: '10px',
                 padding: '12px 15px'
               }}
@@ -232,56 +279,56 @@ function Register() {
               <option value="นาง">นาง</option>
               <option value="นางสาว">นางสาว</option>
             </select>
-            {touched.title && errors.title && (
-              <div className="invalid-feedback">{errors.title}</div>
+            {touched.fullname && errors.fullname && (
+              <div className="invalid-feedback">{errors.fullname}</div>
             )}
           </div>
 
           <div className="row mb-3">
             <div className="col-md-6 mb-3 mb-md-0">
-              <label htmlFor="firstName" className="form-label" style={{ color: '#ad1457', fontWeight: '500' }}>
+              <label htmlFor="fullName" className="form-label" style={{ color: '#ad1457', fontWeight: '500' }}>
                 ชื่อ <span className="text-danger">*</span>
               </label>
               <input 
                 type="text" 
-                className={`form-control ${touched.firstName && errors.firstName ? 'is-invalid' : ''}`} 
-                id="firstName" 
-                name="firstName"
-                value={formData.firstName}
+                className={`form-control ${touched.fullname && errors.fullname ? 'is-invalid' : ''}`} 
+                id="fullname" 
+                name="fullname"
+                value={formData.fullname}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 placeholder="กรอกชื่อ" 
                 style={{
-                  borderColor: touched.firstName && errors.firstName ? '#dc3545' : '#f8bbd0',
+                  borderColor: touched.fullname && errors.fullname ? '#dc3545' : '#f8bbd0',
                   borderRadius: '10px',
                   padding: '12px 15px'
                 }}
               />
-              {touched.firstName && errors.firstName && (
-                <div className="invalid-feedback">{errors.firstName}</div>
+              {touched.fullname && errors.fullname && (
+                <div className="invalid-feedback">{errors.fullname}</div>
               )}
             </div>
             <div className="col-md-6">
-              <label htmlFor="lastName" className="form-label" style={{ color: '#ad1457', fontWeight: '500' }}>
+              <label htmlFor="lastname" className="form-label" style={{ color: '#ad1457', fontWeight: '500' }}>
                 นามสกุล <span className="text-danger">*</span>
               </label>
               <input 
                 type="text" 
-                className={`form-control ${touched.lastName && errors.lastName ? 'is-invalid' : ''}`} 
-                id="lastName" 
-                name="lastName"
-                value={formData.lastName}
+                className={`form-control ${touched.lastname && errors.lastname ? 'is-invalid' : ''}`} 
+                id="lastname" 
+                name="lastname"
+                value={formData.lastname}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 placeholder="กรอกนามสกุล" 
                 style={{
-                  borderColor: touched.lastName && errors.lastName ? '#dc3545' : '#f8bbd0',
+                  borderColor: touched.lastname && errors.lastname ? '#dc3545' : '#f8bbd0',
                   borderRadius: '10px',
                   padding: '12px 15px'
                 }}
               />
-              {touched.lastName && errors.lastName && (
-                <div className="invalid-feedback">{errors.lastName}</div>
+              {touched.lastname && errors.lastname && (
+                <div className="invalid-feedback">{errors.lastname}</div>
               )}
             </div>
           </div>
@@ -317,62 +364,62 @@ function Register() {
             <div className="d-flex">
               <div className="form-check me-4">
                 <input 
-                  className={`form-check-input ${touched.gender && errors.gender ? 'is-invalid' : ''}`} 
+                  className={`form-check-input ${touched.sex && errors.sex ? 'is-invalid' : ''}`} 
                   type="radio" 
-                  name="gender" 
+                  name="sex" 
                   id="genderMale" 
                   value="ชาย"
-                  checked={formData.gender === 'ชาย'}
+                  checked={formData.sex === 'ชาย'}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   style={{
-                    borderColor: touched.gender && errors.gender ? '#dc3545' : '#f8bbd0'
+                    borderColor: touched.sex && errors.sex ? '#dc3545' : '#f8bbd0'
                   }}
                 />
                 <label className="form-check-label" htmlFor="genderMale">ชาย</label>
               </div>
               <div className="form-check">
                 <input 
-                  className={`form-check-input ${touched.gender && errors.gender ? 'is-invalid' : ''}`} 
+                  className={`form-check-input ${touched.sex && errors.sex ? 'is-invalid' : ''}`} 
                   type="radio" 
-                  name="gender" 
+                  name="sex" 
                   id="genderFemale" 
                   value="หญิง"
-                  checked={formData.gender === 'หญิง'}
+                  checked={formData.sex === 'หญิง'}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   style={{
-                    borderColor: touched.gender && errors.gender ? '#dc3545' : '#f8bbd0'
+                    borderColor: touched.sex && errors.sex ? '#dc3545' : '#f8bbd0'
                   }}
                 />
                 <label className="form-check-label" htmlFor="genderFemale">หญิง</label>
               </div>
             </div>
-            {touched.gender && errors.gender && (
-              <div className="text-danger small mt-1">{errors.gender}</div>
+            {touched.sex && errors.sex && (
+              <div className="text-danger small mt-1">{errors.sex}</div>
             )}
           </div>
 
           <div className="mb-3">
-            <label htmlFor="birthDate" className="form-label" style={{ color: '#ad1457', fontWeight: '500' }}>
+            <label htmlFor="birthday" className="form-label" style={{ color: '#ad1457', fontWeight: '500' }}>
               วันเกิด <span className="text-danger">*</span>
             </label>
             <input 
               type="date" 
-              className={`form-control ${touched.birthDate && errors.birthDate ? 'is-invalid' : ''}`} 
-              id="birthDate" 
-              name="birthDate"
-              value={formData.birthDate}
+              className={`form-control ${touched.birthday && errors.birthday ? 'is-invalid' : ''}`} 
+              id="birthday" 
+              name="birthday"
+              value={formData.birthday}
               onChange={handleChange}
               onBlur={handleBlur}
               style={{
-                borderColor: touched.birthDate && errors.birthDate ? '#dc3545' : '#f8bbd0',
+                borderColor: touched.birthday && errors.birthday ? '#dc3545' : '#f8bbd0',
                 borderRadius: '10px',
                 padding: '12px 15px'
               }}
             />
-            {touched.birthDate && errors.birthDate && (
-              <div className="invalid-feedback">{errors.birthDate}</div>
+            {touched.birthday && errors.birthday && (
+              <div className="invalid-feedback">{errors.birthday}</div>
             )}
           </div>
 
