@@ -11,24 +11,26 @@ export default function Page() {
   const [editUser, setEditUser] = useState(null);
   const router = useRouter();
 
-  // ✅ ตรวจสอบ token
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/signin");
+      router.push("/login");
+      return;
     }
   }, []);
 
-  // ✅ โหลดข้อมูลผู้ใช้
   const getUsers = async () => {
     try {
-      const res = await fetch("/api/users", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
+      const res = await fetch(
+        "https://backend-nextjs-virid.vercel.app/api/users",
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
-      console.log("data", data); // ตรวจสอบรูปแบบ
+      console.log("data", data);
       setItems(Array.isArray(data) ? data : data.users || []);
       setLoading(false);
     } catch (error) {
@@ -94,11 +96,14 @@ export default function Page() {
   const handleSave = async () => {
     if (!editUser) return;
     try {
-      const res = await fetch("/api/users", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editUser),
-      });
+      const res = await fetch(
+        "https://backend-nextjs-virid.vercel.app/api/users",
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(editUser),
+        }
+      );
       if (!res.ok) throw new Error("Update failed");
 
       Swal.fire({
@@ -131,7 +136,7 @@ export default function Page() {
   return (
     <>
       <div className="container">
-        <div className="card mt-4">
+        <div className="card mt-4 mb-4">
           <div className="card-header">Users List</div>
           <div className="card-body">
             <table className="table table-striped table-hover">
