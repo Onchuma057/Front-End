@@ -9,7 +9,7 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editUser, setEditUser] = useState(null);
-  const [activeFilter, setActiveFilter] = useState('all');
+  const [activeFilter, setActiveFilter] = useState("all");
   const [modalClosing, setModalClosing] = useState(false);
   const router = useRouter();
 
@@ -22,23 +22,26 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate-fade-in');
-        }
-      });
-    }, { threshold: 0.1 });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("animate-fade-in");
+          }
+        });
+      },
+      { threshold: 0.1 },
+    );
 
     const timeout = setTimeout(() => {
-      document.querySelectorAll('.animate-on-scroll').forEach(item => {
+      document.querySelectorAll(".animate-on-scroll").forEach((item) => {
         observer.observe(item);
       });
     }, 100);
 
     return () => {
       clearTimeout(timeout);
-      document.querySelectorAll('.animate-on-scroll').forEach(item => {
+      document.querySelectorAll(".animate-on-scroll").forEach((item) => {
         observer.unobserve(item);
       });
     };
@@ -51,30 +54,34 @@ export default function Page() {
         closeModal();
       }
     };
-    document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
   }, [showModal]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (showModal) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [showModal]);
 
   const getUsers = async () => {
+    const token = localStorage.getItem("token");
     try {
       const res = await fetch(
-        "https://backend-nextjs-virid.vercel.app/api/users",
+        "https://back-end-five-indol.vercel.app/api/users",
         {
           method: "GET",
-          headers: { "Content-Type": "application/json" },
-        }
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
@@ -94,7 +101,7 @@ export default function Page() {
   }, []);
 
   const openEditModal = (user) => {
-    setEditUser({...user}); // Create a copy to avoid direct mutation
+    setEditUser({ ...user }); // Create a copy to avoid direct mutation
     setModalClosing(false);
     setShowModal(true);
   };
@@ -119,13 +126,22 @@ export default function Page() {
       confirmButtonText: "ใช่, ลบเลย!",
       cancelButtonText: "ยกเลิก",
       background: "#fff0f5",
-      color: "#ad1457"
+      color: "#ad1457",
     }).then(async (result) => {
       if (result.isConfirmed) {
+        const token = localStorage.getItem("token");
+
         try {
           const response = await fetch(
-            `https://backend-nextjs-virid.vercel.app/api/users/${id}`,
-            { method: "DELETE" }
+            `https://back-end-five-indol.vercel.app/api/users/${id}`,
+            {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                // 3. แนบ Bearer Token ใน Headers
+                Authorization: `Bearer ${token}`,
+              },
+            },
           );
           if (!response.ok) throw new Error("Delete failed");
           Swal.fire({
@@ -134,7 +150,7 @@ export default function Page() {
             text: "ลบข้อมูลผู้ใช้เรียบร้อยแล้ว",
             confirmButtonColor: "#ec407a",
             background: "#fff0f5",
-            color: "#ad1457"
+            color: "#ad1457",
           });
           getUsers();
         } catch (error) {
@@ -145,7 +161,7 @@ export default function Page() {
             text: "ไม่สามารถลบข้อมูลผู้ใช้ได้",
             confirmButtonColor: "#ec407a",
             background: "#fff0f5",
-            color: "#ad1457"
+            color: "#ad1457",
           });
         }
       }
@@ -154,29 +170,42 @@ export default function Page() {
 
   const handleSave = async () => {
     if (!editUser) return;
-    
+
     // Basic validation
-    if (!editUser.firstname?.trim() || !editUser.lastname?.trim() || !editUser.username?.trim()) {
+    if (
+      !editUser.firstname?.trim() ||
+      !editUser.lastname?.trim() ||
+      !editUser.username?.trim()
+    ) {
       Swal.fire({
         icon: "warning",
         title: "กรุณากรอกข้อมูล",
         text: "กรุณากรอกชื่อ นามสกุล และชื่อผู้ใช้",
         confirmButtonColor: "#ec407a",
         background: "#fff0f5",
-        color: "#ad1457"
+        color: "#ad1457",
       });
       return;
     }
 
     try {
+      // 1. ดึง Token ออกมา
+      const token = localStorage.getItem("token");
+
       const res = await fetch(
-        "https://backend-nextjs-virid.vercel.app/api/users",
+        // 2. แก้ URL ให้ส่ง ID ไปเป็น Parameter
+        `https://back-end-five-indol.vercel.app/api/users/${editUser.id}`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            // 3. แนบ Bearer Token ใน Headers
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify(editUser),
-        }
+        },
       );
+
       if (!res.ok) throw new Error("Update failed");
 
       Swal.fire({
@@ -185,7 +214,7 @@ export default function Page() {
         text: "อัพเดทข้อมูลผู้ใช้เรียบร้อยแล้ว",
         confirmButtonColor: "#ec407a",
         background: "#fff0f5",
-        color: "#ad1457"
+        color: "#ad1457",
       });
 
       closeModal();
@@ -198,27 +227,37 @@ export default function Page() {
         text: "ไม่สามารถบันทึกข้อมูลผู้ใช้ได้",
         confirmButtonColor: "#ec407a",
         background: "#fff0f5",
-        color: "#ad1457"
+        color: "#ad1457",
       });
     }
   };
 
-  const filteredUsers = activeFilter === 'all' 
-    ? items 
-    : items.filter(user => {
-        if (activeFilter === 'male') return user.sex === 'ชาย';
-        if (activeFilter === 'female') return user.sex === 'หญิง';
-        return true;
-      });
+  const filteredUsers =
+    activeFilter === "all"
+      ? items
+      : items.filter((user) => {
+          if (activeFilter === "male") return user.sex === "ชาย";
+          if (activeFilter === "female") return user.sex === "หญิง";
+          return true;
+        });
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: "50vh" }}>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "50vh" }}
+      >
         <div className="text-center">
-          <div className="spinner-border" style={{ color: "#ec407a", width: "3rem", height: "3rem" }} role="status">
+          <div
+            className="spinner-border"
+            style={{ color: "#ec407a", width: "3rem", height: "3rem" }}
+            role="status"
+          >
             <span className="visually-hidden">กำลังโหลด...</span>
           </div>
-          <h4 style={{ color: "#d81b60", marginTop: "20px" }}>กำลังโหลดข้อมูล...</h4>
+          <h4 style={{ color: "#d81b60", marginTop: "20px" }}>
+            กำลังโหลดข้อมูล...
+          </h4>
         </div>
       </div>
     );
@@ -227,66 +266,73 @@ export default function Page() {
   return (
     <>
       <div className="container py-5">
-
         {/* Filter Tabs */}
         <div className="row mb-4 animate-on-scroll">
           <div className="col-12 text-center">
-            <div className="btn-group" role="group" aria-label="User filters" style={{
-              backgroundColor: "#fce4ec",
-              padding: "5px",
-              borderRadius: "30px",
-              boxShadow: "0 4px 10px rgba(0,0,0,0.05)"
-            }}>
-              <button 
-                type="button" 
-                className={`btn ${activeFilter === 'all' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('all')}
+            <div
+              className="btn-group"
+              role="group"
+              aria-label="User filters"
+              style={{
+                backgroundColor: "#fce4ec",
+                padding: "5px",
+                borderRadius: "30px",
+                boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+              }}
+            >
+              <button
+                type="button"
+                className={`btn ${activeFilter === "all" ? "active" : ""}`}
+                onClick={() => setActiveFilter("all")}
                 style={{
-                  backgroundColor: activeFilter === 'all' ? "#ec407a" : "transparent",
-                  color: activeFilter === 'all' ? "white" : "#ad1457",
+                  backgroundColor:
+                    activeFilter === "all" ? "#ec407a" : "transparent",
+                  color: activeFilter === "all" ? "white" : "#ad1457",
                   border: "none",
                   borderRadius: "25px",
                   padding: "8px 20px",
                   margin: "0 5px",
                   fontWeight: "500",
-                  transition: "all 0.3s ease"
+                  transition: "all 0.3s ease",
                 }}
               >
                 ทั้งหมด ({items.length})
               </button>
-              <button 
-                type="button" 
-                className={`btn ${activeFilter === 'male' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('male')}
+              <button
+                type="button"
+                className={`btn ${activeFilter === "male" ? "active" : ""}`}
+                onClick={() => setActiveFilter("male")}
                 style={{
-                  backgroundColor: activeFilter === 'male' ? "#ec407a" : "transparent",
-                  color: activeFilter === 'male' ? "white" : "#ad1457",
+                  backgroundColor:
+                    activeFilter === "male" ? "#ec407a" : "transparent",
+                  color: activeFilter === "male" ? "white" : "#ad1457",
                   border: "none",
                   borderRadius: "25px",
                   padding: "8px 20px",
                   margin: "0 5px",
                   fontWeight: "500",
-                  transition: "all 0.3s ease"
+                  transition: "all 0.3s ease",
                 }}
               >
-                ชาย ({items.filter(u => u.sex === 'ชาย').length})
+                ชาย ({items.filter((u) => u.sex === "ชาย").length})
               </button>
-              <button 
-                type="button" 
-                className={`btn ${activeFilter === 'female' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('female')}
+              <button
+                type="button"
+                className={`btn ${activeFilter === "female" ? "active" : ""}`}
+                onClick={() => setActiveFilter("female")}
                 style={{
-                  backgroundColor: activeFilter === 'female' ? "#ec407a" : "transparent",
-                  color: activeFilter === 'female' ? "white" : "#ad1457",
+                  backgroundColor:
+                    activeFilter === "female" ? "#ec407a" : "transparent",
+                  color: activeFilter === "female" ? "white" : "#ad1457",
                   border: "none",
                   borderRadius: "25px",
                   padding: "8px 20px",
                   margin: "0 5px",
                   fontWeight: "500",
-                  transition: "all 0.3s ease"
+                  transition: "all 0.3s ease",
                 }}
               >
-                หญิง ({items.filter(u => u.sex === 'หญิง').length})
+                หญิง ({items.filter((u) => u.sex === "หญิง").length})
               </button>
             </div>
           </div>
@@ -295,86 +341,120 @@ export default function Page() {
         {/* Users Cards */}
         <div className="row">
           {filteredUsers.map((item, index) => (
-            <div key={item.id} className="col-md-6 col-lg-4 mb-4 animate-on-scroll">
-              <div className="card border-0 h-100" style={{
-                borderRadius: "20px",
-                overflow: "hidden",
-                boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
-                transition: "all 0.3s ease",
-                background: "linear-gradient(135deg, #fff0f5 0%, #fce4ec 100%)"
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-10px)";
-                e.currentTarget.style.boxShadow = "0 15px 30px rgba(244, 143, 177, 0.3)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 10px 20px rgba(0,0,0,0.1)";
-              }}>
-                <div className="card-header" style={{ 
-                  backgroundColor: "#ec407a",
-                  border: "none",
-                  color: "white",
-                  textAlign: "center",
-                  fontWeight: "bold",
-                  fontSize: "1.1rem"
-                }}>
+            <div
+              key={item.id}
+              className="col-md-6 col-lg-4 mb-4 animate-on-scroll"
+            >
+              <div
+                className="card border-0 h-100"
+                style={{
+                  borderRadius: "20px",
+                  overflow: "hidden",
+                  boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
+                  transition: "all 0.3s ease",
+                  background:
+                    "linear-gradient(135deg, #fff0f5 0%, #fce4ec 100%)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-10px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 15px 30px rgba(244, 143, 177, 0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow =
+                    "0 10px 20px rgba(0,0,0,0.1)";
+                }}
+              >
+                <div
+                  className="card-header"
+                  style={{
+                    backgroundColor: "#ec407a",
+                    border: "none",
+                    color: "white",
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    fontSize: "1.1rem",
+                  }}
+                >
                   <div className="d-flex justify-content-between align-items-center">
                     <span>#{item.id}</span>
-                    <div style={{
-                      backgroundColor: "rgba(255,255,255,0.2)",
-                      padding: "5px 12px",
-                      borderRadius: "15px",
-                      fontSize: "0.8rem"
-                    }}>
-                      {item.sex || 'ไม่ระบุ'}
+                    <div
+                      style={{
+                        backgroundColor: "rgba(255,255,255,0.2)",
+                        padding: "5px 12px",
+                        borderRadius: "15px",
+                        fontSize: "0.8rem",
+                      }}
+                    >
+                      {item.sex || "ไม่ระบุ"}
                     </div>
                   </div>
                 </div>
 
                 <div className="card-body p-4">
                   <div className="text-center mb-3">
-                    <div style={{
-                      width: "80px",
-                      height: "80px",
-                      borderRadius: "50%",
-                      backgroundColor: item.sex === 'ชาย' ? "#81d4fa" : item.sex === 'หญิง' ? "#f8bbd0" : "#e1bee7",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      margin: "0 auto",
-                      fontSize: "2rem",
-                      color: "white",
-                      fontWeight: "bold",
-                      boxShadow: "0 4px 10px rgba(0,0,0,0.1)"
-                    }}>
-                      {item.firstname ? item.firstname.charAt(0).toUpperCase() : 'U'}
+                    <div
+                      style={{
+                        width: "80px",
+                        height: "80px",
+                        borderRadius: "50%",
+                        backgroundColor:
+                          item.sex === "ชาย"
+                            ? "#81d4fa"
+                            : item.sex === "หญิง"
+                              ? "#f8bbd0"
+                              : "#e1bee7",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        margin: "0 auto",
+                        fontSize: "2rem",
+                        color: "white",
+                        fontWeight: "bold",
+                        boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+                      }}
+                    >
+                      {item.firstname
+                        ? item.firstname.charAt(0).toUpperCase()
+                        : "U"}
                     </div>
                   </div>
 
-                  <h5 className="text-center mb-3" style={{ color: "#d81b60", fontWeight: "600" }}>
+                  <h5
+                    className="text-center mb-3"
+                    style={{ color: "#d81b60", fontWeight: "600" }}
+                  >
                     {item.firstname} {item.lastname}
                   </h5>
 
                   <div className="info-item mb-2">
                     <strong style={{ color: "#ad1457" }}>ชื่อเต็ม:</strong>
-                    <span style={{ color: "#555", marginLeft: "8px" }}>{item.fullname || 'ไม่ระบุ'}</span>
+                    <span style={{ color: "#555", marginLeft: "8px" }}>
+                      {item.fullname || "ไม่ระบุ"}
+                    </span>
                   </div>
 
                   <div className="info-item mb-2">
                     <strong style={{ color: "#ad1457" }}>ชื่อผู้ใช้:</strong>
-                    <span style={{ color: "#555", marginLeft: "8px" }}>{item.username}</span>
+                    <span style={{ color: "#555", marginLeft: "8px" }}>
+                      {item.username}
+                    </span>
                   </div>
 
                   <div className="info-item mb-2">
                     <strong style={{ color: "#ad1457" }}>ที่อยู่:</strong>
-                    <span style={{ color: "#555", marginLeft: "8px" }}>{item.address || 'ไม่ระบุ'}</span>
+                    <span style={{ color: "#555", marginLeft: "8px" }}>
+                      {item.address || "ไม่ระบุ"}
+                    </span>
                   </div>
 
                   <div className="info-item mb-3">
                     <strong style={{ color: "#ad1457" }}>วันเกิด:</strong>
                     <span style={{ color: "#555", marginLeft: "8px" }}>
-                      {item.birthday ? new Date(item.birthday).toLocaleDateString('th-TH') : 'ไม่ระบุ'}
+                      {item.birthday
+                        ? new Date(item.birthday).toLocaleDateString("th-TH")
+                        : "ไม่ระบุ"}
                     </span>
                   </div>
 
@@ -390,7 +470,7 @@ export default function Page() {
                         fontWeight: "500",
                         border: "none",
                         boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                        transition: "all 0.3s ease"
+                        transition: "all 0.3s ease",
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.backgroundColor = "#ffb300";
@@ -414,7 +494,7 @@ export default function Page() {
                         fontWeight: "500",
                         border: "none",
                         boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                        transition: "all 0.3s ease"
+                        transition: "all 0.3s ease",
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.backgroundColor = "#d32f2f";
@@ -436,10 +516,18 @@ export default function Page() {
 
         {filteredUsers.length === 0 && (
           <div className="text-center py-5 animate-on-scroll">
-            <div style={{ fontSize: "4rem", color: "#f8bbd0", marginBottom: "20px" }}>
+            <div
+              style={{
+                fontSize: "4rem",
+                color: "#f8bbd0",
+                marginBottom: "20px",
+              }}
+            >
               <i className="bi bi-person-x"></i>
             </div>
-            <h4 style={{ color: "#d81b60", marginBottom: "15px" }}>ไม่พบข้อมูลผู้ใช้</h4>
+            <h4 style={{ color: "#d81b60", marginBottom: "15px" }}>
+              ไม่พบข้อมูลผู้ใช้
+            </h4>
             <p style={{ color: "#ad1457" }}>ไม่มีผู้ใช้ในหมวดหมู่ที่เลือก</p>
           </div>
         )}
@@ -447,34 +535,51 @@ export default function Page() {
         {/* Statistics Section */}
         <div className="row mt-5 pt-4 animate-on-scroll">
           <div className="col-12 text-center mb-4">
-            <h2 style={{
-              color: "#d81b60",
-              position: "relative",
-              display: "inline-block",
-              marginBottom: "20px"
-            }}>
-              <span style={{
+            <h2
+              style={{
+                color: "#d81b60",
                 position: "relative",
-                zIndex: "1"
-              }}>สถิติผู้ใช้งาน</span>
-              <span style={{
-                position: "absolute",
-                height: "8px",
-                width: "100%",
-                bottom: "0",
-                left: "0",
-                backgroundColor: "#f8bbd0",
-                zIndex: "0"
-              }}></span>
+                display: "inline-block",
+                marginBottom: "20px",
+              }}
+            >
+              <span
+                style={{
+                  position: "relative",
+                  zIndex: "1",
+                }}
+              >
+                สถิติผู้ใช้งาน
+              </span>
+              <span
+                style={{
+                  position: "absolute",
+                  height: "8px",
+                  width: "100%",
+                  bottom: "0",
+                  left: "0",
+                  backgroundColor: "#f8bbd0",
+                  zIndex: "0",
+                }}
+              ></span>
             </h2>
           </div>
           <div className="col-md-4 mb-3">
-            <div className="text-center p-4" style={{
-              backgroundColor: "#e1f5fe",
-              borderRadius: "20px",
-              boxShadow: "0 8px 20px rgba(0,0,0,0.08)"
-            }}>
-              <div style={{ fontSize: "3rem", color: "#0288d1", marginBottom: "10px" }}>
+            <div
+              className="text-center p-4"
+              style={{
+                backgroundColor: "#e1f5fe",
+                borderRadius: "20px",
+                boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "3rem",
+                  color: "#0288d1",
+                  marginBottom: "10px",
+                }}
+              >
                 <i className="bi bi-people"></i>
               </div>
               <h3 style={{ color: "#0277bd", margin: "0" }}>{items.length}</h3>
@@ -482,28 +587,50 @@ export default function Page() {
             </div>
           </div>
           <div className="col-md-4 mb-3">
-            <div className="text-center p-4" style={{
-              backgroundColor: "#e3f2fd",
-              borderRadius: "20px",
-              boxShadow: "0 8px 20px rgba(0,0,0,0.08)"
-            }}>
-              <div style={{ fontSize: "3rem", color: "#1976d2", marginBottom: "10px" }}>
+            <div
+              className="text-center p-4"
+              style={{
+                backgroundColor: "#e3f2fd",
+                borderRadius: "20px",
+                boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "3rem",
+                  color: "#1976d2",
+                  marginBottom: "10px",
+                }}
+              >
                 <i className="bi bi-person-check"></i>
               </div>
-              <h3 style={{ color: "#1565c0", margin: "0" }}>{items.filter(u => u.sex === 'ชาย').length}</h3>
+              <h3 style={{ color: "#1565c0", margin: "0" }}>
+                {items.filter((u) => u.sex === "ชาย").length}
+              </h3>
               <p style={{ color: "#1976d2", margin: "0" }}>ผู้ใช้ชาย</p>
             </div>
           </div>
           <div className="col-md-4 mb-3">
-            <div className="text-center p-4" style={{
-              backgroundColor: "#fce4ec",
-              borderRadius: "20px",
-              boxShadow: "0 8px 20px rgba(0,0,0,0.08)"
-            }}>
-              <div style={{ fontSize: "3rem", color: "#ec407a", marginBottom: "10px" }}>
+            <div
+              className="text-center p-4"
+              style={{
+                backgroundColor: "#fce4ec",
+                borderRadius: "20px",
+                boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "3rem",
+                  color: "#ec407a",
+                  marginBottom: "10px",
+                }}
+              >
                 <i className="bi bi-person-heart"></i>
               </div>
-              <h3 style={{ color: "#d81b60", margin: "0" }}>{items.filter(u => u.sex === 'หญิง').length}</h3>
+              <h3 style={{ color: "#d81b60", margin: "0" }}>
+                {items.filter((u) => u.sex === "หญิง").length}
+              </h3>
               <p style={{ color: "#ec407a", margin: "0" }}>ผู้ใช้หญิง</p>
             </div>
           </div>
@@ -512,38 +639,62 @@ export default function Page() {
 
       {/* Enhanced Edit Modal */}
       {showModal && (
-        <div 
-          className={`modal-overlay ${modalClosing ? 'modal-overlay-closing' : ''}`}
+        <div
+          className={`modal-overlay ${modalClosing ? "modal-overlay-closing" : ""}`}
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               closeModal();
             }
           }}
         >
-          <div className={`modal-content-enhanced ${modalClosing ? 'modal-content-closing' : ''}`}>
+          <div
+            className={`modal-content-enhanced ${modalClosing ? "modal-content-closing" : ""}`}
+          >
             {/* Modal Header with improved styling */}
             <div className="modal-header-enhanced">
               <div className="d-flex align-items-center">
-                <div style={{
-                  width: "50px",
-                  height: "50px",
-                  borderRadius: "50%",
-                  backgroundColor: editUser?.sex === 'ชาย' ? "#81d4fa" : editUser?.sex === 'หญิง' ? "#f8bbd0" : "#e1bee7",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginRight: "15px",
-                  fontSize: "1.5rem",
-                  color: "white",
-                  fontWeight: "bold"
-                }}>
-                  {editUser?.firstname ? editUser.firstname.charAt(0).toUpperCase() : 'U'}
+                <div
+                  style={{
+                    width: "50px",
+                    height: "50px",
+                    borderRadius: "50%",
+                    backgroundColor:
+                      editUser?.sex === "ชาย"
+                        ? "#81d4fa"
+                        : editUser?.sex === "หญิง"
+                          ? "#f8bbd0"
+                          : "#e1bee7",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginRight: "15px",
+                    fontSize: "1.5rem",
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {editUser?.firstname
+                    ? editUser.firstname.charAt(0).toUpperCase()
+                    : "U"}
                 </div>
                 <div>
-                  <h5 style={{ color: "#d81b60", fontWeight: "700", margin: "0", fontSize: "1.3rem" }}>
+                  <h5
+                    style={{
+                      color: "#d81b60",
+                      fontWeight: "700",
+                      margin: "0",
+                      fontSize: "1.3rem",
+                    }}
+                  >
                     แก้ไขข้อมูลผู้ใช้
                   </h5>
-                  <p style={{ color: "#ad1457", margin: "0", fontSize: "0.9rem" }}>
+                  <p
+                    style={{
+                      color: "#ad1457",
+                      margin: "0",
+                      fontSize: "0.9rem",
+                    }}
+                  >
                     {editUser?.firstname} {editUser?.lastname}
                   </p>
                 </div>
@@ -559,31 +710,42 @@ export default function Page() {
             </div>
 
             {/* Modal Body with form */}
-            <form onSubmit={(e) => {e.preventDefault(); handleSave();}}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSave();
+              }}
+            >
               <div className="modal-body-enhanced">
                 <div className="row">
                   <div className="col-md-6 mb-4">
                     <label className="form-label-enhanced">
-                      <i className="bi bi-person me-2"></i> ชื่อ <span className="required">*</span>
+                      <i className="bi bi-person me-2"></i> ชื่อ{" "}
+                      <span className="required">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control-enhanced"
-                      value={editUser?.firstname || ''}
-                      onChange={(e) => setEditUser({ ...editUser, firstname: e.target.value })}
+                      value={editUser?.firstname || ""}
+                      onChange={(e) =>
+                        setEditUser({ ...editUser, firstname: e.target.value })
+                      }
                       placeholder="กรอกชื่อ"
                       required
                     />
                   </div>
                   <div className="col-md-6 mb-4">
                     <label className="form-label-enhanced">
-                      <i className="bi bi-person me-2"></i> นามสกุล <span className="required">*</span>
+                      <i className="bi bi-person me-2"></i> นามสกุล{" "}
+                      <span className="required">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control-enhanced"
-                      value={editUser?.lastname || ''}
-                      onChange={(e) => setEditUser({ ...editUser, lastname: e.target.value })}
+                      value={editUser?.lastname || ""}
+                      onChange={(e) =>
+                        setEditUser({ ...editUser, lastname: e.target.value })
+                      }
                       placeholder="กรอกนามสกุล"
                       required
                     />
@@ -597,21 +759,26 @@ export default function Page() {
                   <input
                     type="text"
                     className="form-control-enhanced"
-                    value={editUser?.fullname || ''}
-                    onChange={(e) => setEditUser({ ...editUser, fullname: e.target.value })}
+                    value={editUser?.fullname || ""}
+                    onChange={(e) =>
+                      setEditUser({ ...editUser, fullname: e.target.value })
+                    }
                     placeholder="กรอกชื่อเต็ม"
                   />
                 </div>
 
                 <div className="mb-4">
                   <label className="form-label-enhanced">
-                    <i className="bi bi-at me-2"></i> ชื่อผู้ใช้ <span className="required">*</span>
+                    <i className="bi bi-at me-2"></i> ชื่อผู้ใช้{" "}
+                    <span className="required">*</span>
                   </label>
                   <input
                     type="text"
                     className="form-control-enhanced"
-                    value={editUser?.username || ''}
-                    onChange={(e) => setEditUser({ ...editUser, username: e.target.value })}
+                    value={editUser?.username || ""}
+                    onChange={(e) =>
+                      setEditUser({ ...editUser, username: e.target.value })
+                    }
                     placeholder="กรอกชื่อผู้ใช้"
                     required
                   />
@@ -624,8 +791,10 @@ export default function Page() {
                   <textarea
                     className="form-control-enhanced"
                     rows="3"
-                    value={editUser?.address || ''}
-                    onChange={(e) => setEditUser({ ...editUser, address: e.target.value })}
+                    value={editUser?.address || ""}
+                    onChange={(e) =>
+                      setEditUser({ ...editUser, address: e.target.value })
+                    }
                     placeholder="กรอกที่อยู่"
                     style={{ resize: "none" }}
                   />
@@ -638,8 +807,10 @@ export default function Page() {
                     </label>
                     <select
                       className="form-control-enhanced"
-                      value={editUser?.sex || ''}
-                      onChange={(e) => setEditUser({ ...editUser, sex: e.target.value })}
+                      value={editUser?.sex || ""}
+                      onChange={(e) =>
+                        setEditUser({ ...editUser, sex: e.target.value })
+                      }
                     >
                       <option value="">เลือกเพศ</option>
                       <option value="ชาย">ชาย</option>
@@ -654,8 +825,14 @@ export default function Page() {
                     <input
                       type="date"
                       className="form-control-enhanced"
-                      value={editUser?.birthday || ''}
-                      onChange={(e) => setEditUser({ ...editUser, birthday: e.target.value })}
+                      value={
+                        editUser?.birthday
+                          ? editUser.birthday.split("T")[0]
+                          : ""
+                      }
+                      onChange={(e) =>
+                        setEditUser({ ...editUser, birthday: e.target.value })
+                      }
                     />
                   </div>
                 </div>
@@ -670,10 +847,7 @@ export default function Page() {
                 >
                   <i className="bi bi-x-circle me-2"></i> ยกเลิก
                 </button>
-                <button
-                  type="submit"
-                  className="btn btn-save-enhanced"
-                >
+                <button type="submit" className="btn btn-save-enhanced">
                   <i className="bi bi-check-circle me-2"></i> บันทึกการแก้ไข
                 </button>
               </div>
@@ -683,7 +857,10 @@ export default function Page() {
       )}
 
       {/* Add Bootstrap Icons */}
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+      />
 
       {/* Enhanced Styles */}
       <style jsx global>{`
@@ -933,29 +1110,29 @@ export default function Page() {
           .modal-overlay {
             padding: 10px;
           }
-          
+
           .modal-content-enhanced {
             max-width: 95%;
             max-height: 95vh;
             border-radius: 20px;
           }
-          
+
           .modal-header-enhanced,
           .modal-body-enhanced,
           .modal-footer-enhanced {
             padding: 20px;
           }
-          
+
           .modal-footer-enhanced {
             flex-direction: column;
           }
-          
+
           .btn-cancel-enhanced,
           .btn-save-enhanced {
             width: 100%;
             margin: 5px 0;
           }
-          
+
           .form-control-enhanced {
             padding: 12px 15px;
           }
@@ -965,7 +1142,7 @@ export default function Page() {
           .modal-header-enhanced h5 {
             font-size: 1.1rem;
           }
-          
+
           .modal-header-enhanced p {
             font-size: 0.8rem;
           }
@@ -1018,13 +1195,19 @@ export default function Page() {
 
         /* Card hover effects */
         .card:hover .card-header {
-          background: linear-gradient(135deg, #ec407a 0%, #d81b60 100%) !important;
+          background: linear-gradient(
+            135deg,
+            #ec407a 0%,
+            #d81b60 100%
+          ) !important;
         }
 
         /* Button hover effects */
-        .btn:not(.active):not(.btn-cancel-enhanced):not(.btn-save-enhanced):hover {
+        .btn:not(.active):not(.btn-cancel-enhanced):not(
+            .btn-save-enhanced
+          ):hover {
           transform: translateY(-1px);
-          box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
 
         /* Focus trap for accessibility */

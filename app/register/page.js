@@ -134,7 +134,7 @@ function Register() {
 
       try {
         const res = await fetch(
-          "https://backend-nextjs-virid.vercel.app/api/users",
+          "https://back-end-five-indol.vercel.app/api/auth/register",
           {
             method: "POST",
             headers: {

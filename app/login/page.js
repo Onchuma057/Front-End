@@ -71,7 +71,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
     try {
       const res = await fetch(
-        "https://backend-nextjs-virid.vercel.app/api/auth/login",
+        "https://back-end-five-indol.vercel.app/api/auth/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
